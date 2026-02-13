@@ -2,7 +2,10 @@ module kron
 
 go 1.25.6
 
-require github.com/pocketbase/pocketbase v0.36.2
+require (
+	github.com/pocketbase/pocketbase v0.36.2
+	maragu.dev/gomponents v1.2.0
+)
 
 require (
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
@@ -32,7 +35,6 @@ require (
 	golang.org/x/sync v0.19.0 // indirect
 	golang.org/x/sys v0.40.0 // indirect
 	golang.org/x/text v0.33.0 // indirect
-	maragu.dev/gomponents v1.2.0 // indirect
 	modernc.org/libc v1.67.6 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
