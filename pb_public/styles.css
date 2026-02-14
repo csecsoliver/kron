@@ -1,4 +1,6 @@
-
+body {
+    margin: 10px; 
+}
 nav ul {
     display: flex;
     list-style-type: none;

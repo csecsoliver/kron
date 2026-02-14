@@ -30,10 +30,10 @@ func main() {
 		// idk about thisű
 		// 
 		se.Router.GET("/static/{path...}", apis.Static(os.DirFS("./pb_public"), false))
-		se.Router.GET("/hello/{name}", hello)
 		se.Router.GET("/", func(r *core.RequestEvent) error { return views.HomePage().Render(r.Response) })
 		se.Router.GET("/login", gLogin)
 		se.Router.POST("/login", pLogin)
+		// se.Router.GET("/dash", gDashboard)
 		return se.Next()
 	})
 
@@ -90,3 +90,4 @@ func pLogin(r *core.RequestEvent) error {
 	})
 	return r.Redirect(302, "/")
 }
+
