@@ -25,15 +25,12 @@ func main() {
 	})
 
 	app.OnServe().BindFunc(func(se *core.ServeEvent) error {
-		// Middleware to load auth context from cookie
-		// se.Router.Middlewares = append(se.Router.Middlewares, apis.RequireAuth())
-		// idk about thisű
-		// 
 		se.Router.GET("/static/{path...}", apis.Static(os.DirFS("./pb_public"), false))
 		se.Router.GET("/", func(r *core.RequestEvent) error { return views.HomePage().Render(r.Response) })
 		se.Router.GET("/login", gLogin)
 		se.Router.POST("/login", pLogin)
-		// se.Router.GET("/dash", gDashboard)
+		
+		se.Router.GET("/dash", gDashboard)
 		return se.Next()
 	})
 
@@ -51,6 +48,7 @@ func hello(r *core.RequestEvent) error {
 	).Render(r.Response)
 }
 func gLogin(r *core.RequestEvent) error {
+
 	return views.LoginPage("").Render(r.Response)
 }
 func pLogin(r *core.RequestEvent) error {
@@ -72,22 +70,21 @@ func pLogin(r *core.RequestEvent) error {
 		if !record.ValidatePassword(password) {
 			return views.LoginPage("Invalid Email or Password").Render(r.Response)
 		}
-		
+
 	}
 	token, err := record.NewAuthToken()
 	if err != nil {
 		return views.LoginPage("Failed to create auth token: " + err.Error()).Render(r.Response)
 	}
-	
+
 	http.SetCookie(r.Response, &http.Cookie{
-		Name: "pb_auth",
-		Value: token,
-		Path: "/",
+		Name:     "pb_auth",
+		Value:    token,
+		Path:     "/",
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
-		Secure: false,
-		Expires: time.Now().Add(time.Hour*10),
+		Secure:   false,
+		Expires:  time.Now().Add(time.Hour * 10),
 	})
-	return r.Redirect(302, "/")
+	return r.Redirect(302, "/dash")
 }
-

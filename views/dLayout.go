@@ -6,8 +6,8 @@ import (
 )
 
 func DashboardLayout(title string, children ...Node) Node {
-	return Div(Class("dashboard"),
+	return BaseLayout(title, Div(Class("dashboard"),
 		Header(H1(Text(title))),
 		Main(children...),
-	)
+	))
 }
