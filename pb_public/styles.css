@@ -14,3 +14,17 @@ nav ul li {
     font-weight: bold;
     
 }
+form * {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+#dHome {
+    display: flex;
+}
+#dHome>* {
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    border: 1px solid black;
+    border-radius: 3px;
+}

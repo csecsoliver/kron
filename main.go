@@ -29,6 +29,11 @@ func main() {
 		se.Router.GET("/", func(r *core.RequestEvent) error { return views.HomePage().Render(r.Response) })
 		se.Router.GET("/login", gLogin)
 		se.Router.POST("/login", pLogin)
+		se.Router.GET("/dash/jobs", gJobs)
+		se.Router.POST("/dash/jobs", pJobs)
+		se.Router.GET("/dash/jobs/{id}", gJob)
+		se.Router.DELETE("/dash/jobs/{id}", dJob)
+		
 		
 		se.Router.GET("/dash", gDashboard)
 		return se.Next()
