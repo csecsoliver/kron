@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
+	//"time"
 
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/apis"
@@ -30,9 +30,9 @@ func main() {
 		se.Router.GET("/login", gLogin)
 		se.Router.POST("/login", pLogin)
 		se.Router.GET("/dash/jobs", gJobs)
-		se.Router.POST("/dash/jobs", pJobs)
-		se.Router.GET("/dash/jobs/{id}", gJob)
-		se.Router.DELETE("/dash/jobs/{id}", dJob)
+		//se.Router.POST("/dash/jobs", pJobs)
+		//se.Router.GET("/dash/jobs/{id}", gJob)
+		//se.Router.DELETE("/dash/jobs/{id}", dJob)
 		
 		
 		se.Router.GET("/dash", gDashboard)
@@ -89,7 +89,7 @@ func pLogin(r *core.RequestEvent) error {
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
 		Secure:   false,
-		Expires:  time.Now().Add(time.Hour * 10),
+		// Expires:  time.Now().Add(time.Hour * 10),
 	})
 	return r.Redirect(302, "/dash")
 }

@@ -11,6 +11,8 @@ import (
 
 	_ "kron/migrations"
 	"kron/views"
+	"kron/models"
+	
 )
 
 func gDashboard(r *core.RequestEvent) error {
@@ -23,11 +25,14 @@ func gJobs(r *core.RequestEvent) error {
 	if err != nil {
 		return err
 	}
-	names, urls := []string{}, []string{}
+	jobs := []models.Job{}
 	for _, record := range records {
-		names = append(names, record.GetString("name"))
-		urls = append(urls, record.GetString("url"))
+		err, job := jobRecordToStruct(record)
+		if err != nil {
+			return err
+		}
+		jobs = append(jobs, job)
 	}
-	html := views.JobsList(names, urls)
+	html := views.JobsList(jobs)
 	return html.Render(r.Response)
 }
