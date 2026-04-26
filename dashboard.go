@@ -10,9 +10,8 @@ import (
 	//. "maragu.dev/gomponents/html"
 
 	_ "kron/migrations"
-	"kron/views"
 	"kron/models"
-	
+	"kron/views"
 )
 
 func gDashboard(r *core.RequestEvent) error {
@@ -25,9 +24,9 @@ func gJobs(r *core.RequestEvent) error {
 	if err != nil {
 		return err
 	}
-	jobs := []models.Job{}
+	var jobs []models.Job
 	for _, record := range records {
-		err, job := jobRecordToStruct(record)
+		job, err := jobRecordToStruct(record)
 		if err != nil {
 			return err
 		}
@@ -35,4 +34,19 @@ func gJobs(r *core.RequestEvent) error {
 	}
 	html := views.JobsList(jobs)
 	return html.Render(r.Response)
+}
+func pJob(r *core.RequestEvent) error {
+	e := r.Request.ParseForm()
+	if e != nil {
+		return r.Error(400, "Bad request", e)
+	}
+	requiredFields := [5]string{"name", "target", "method", "body", "expected"}
+	for _, field := range requiredFields {
+		if !r.Request.Form.Has(field) {
+			return r.Error(400, "missing field"+field, nil)
+		}
+	}
+
+	return nil
+
 }

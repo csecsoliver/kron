@@ -4,6 +4,7 @@ import (
 	. "maragu.dev/gomponents"
 	. "maragu.dev/gomponents/html"
 )
+
 func DashboardHome() Node {
 	return DashboardLayout("Dashboard", Div(
 		ID("dHome"),
@@ -15,8 +16,8 @@ func DashboardHome() Node {
 				Attr("hx-swap", "innerHTML"),
 				Label(For("name"), Text("Name")),
 				Input(Type("text"), Name("name"), Placeholder("Job name")),
-				Label(For("url"), Text("URL")),
-				Input(Type("text"), Name("url"), Placeholder("URL to check"), Required()),
+				Label(For("target"), Text("Target URL")),
+				Input(Type("text"), Name("target"), Placeholder("URL to check"), Required()),
 				Label(For("method"), Text("Method")),
 				Select(Name("method"), Required(),
 					Option(Value("GET"), Text("GET")),
@@ -24,16 +25,15 @@ func DashboardHome() Node {
 					Option(Value("PUT"), Text("PUT")),
 					Option(Value("DELETE"), Text("DELETE")),
 				),
-				Label(For("body"), Text("Body (optional)")),
-				Textarea(Name("body"), Placeholder("Request body")),
-				Label(For("expected"), Text("Expected Response (optional)")),
-				Textarea(Name("expected"), Placeholder("Expected response body")),
-				
+				Label(For("request"), Text("Request body (optional)")),
+				Textarea(Name("request"), Placeholder("Request body")),
+				Label(For("expected_response"), Text("Expected Response (optional)")),
+				Textarea(Name("expected_response"), Placeholder("Expected response body")),
+
 				Button(Type("submit"), Text("Create new job")),
-				
 			),
 			Div(
-				ID("newjobres"),	
+				ID("newjobres"),
 			),
 		),
 		Div(

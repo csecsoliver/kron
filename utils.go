@@ -1,11 +1,13 @@
 package main
 
 import (
-	"kron/models"
-	"github.com/pocketbase/pocketbase/core"
 	"encoding/json"
+	"kron/models"
+
+	"github.com/pocketbase/pocketbase/core"
 )
-func jobRecordToStruct(record *core.Record) (error, models.Job )	{
+
+func jobRecordToStruct(record *core.Record) (models.Job, error) {
 	var job models.Job
 	job.Name = record.GetString("name")
 	job.Target = record.GetString("target")
@@ -13,7 +15,7 @@ func jobRecordToStruct(record *core.Record) (error, models.Job )	{
 	job.Schedule = record.GetString("schedule")
 	err := json.Unmarshal([]byte(record.GetString("request")), &job.Request)
 	if err != nil {
-		return err, job
+		return job, err
 	}
-	return nil, job
+	return job, nil
 }
