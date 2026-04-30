@@ -28,10 +28,10 @@ func init() {
 		collection.Fields.Add(&core.JSONField{
 			Name: "request",
 		})
-		collection.Fields.Add(&core.JSONField{
+		collection.Fields.Add(&core.TextField{
 			Name: "expected_response",
 		})
-		collection.Fields.Add(&core.JSONField{
+		collection.Fields.Add(&core.TextField{
 			Name: "schedule",
 			
 		})

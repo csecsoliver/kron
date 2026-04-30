@@ -29,7 +29,8 @@ func DashboardHome() Node {
 				Textarea(Name("request"), Placeholder("Request body")),
 				Label(For("expected_response"), Text("Expected Response (optional)")),
 				Textarea(Name("expected_response"), Placeholder("Expected response body")),
-
+				Label(For("schedule"), Text("Schedule (cron format)")),
+				Input(Type("text"), ID("schedule"), Name("schedule")),
 				Button(Type("submit"), Text("Create new job")),
 			),
 			Div(

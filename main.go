@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	
 	//"time"
 
 	"github.com/pocketbase/pocketbase"
@@ -23,14 +24,29 @@ func main() {
 	migratecmd.MustRegister(app, app.RootCmd, migratecmd.Config{
 		Automigrate: true,
 	})
-
 	app.OnServe().BindFunc(func(se *core.ServeEvent) error {
+		err := reloadJobs(app)
+		if err != nil {
+			println("Failed to reload jobs: " + err.Error())
+		}
+		se.Router.BindFunc(func(e *core.RequestEvent) error {
+			cookie, err := e.Request.Cookie("pb_auth")
+			if err == nil {
+				record, err := e.App.FindAuthRecordByToken(cookie.Value)
+				if err == nil {
+					e.Auth = record
+				}
+			}
+			return e.Next()
+		})
+		
+		
 		se.Router.GET("/static/{path...}", apis.Static(os.DirFS("./pb_public"), false))
 		se.Router.GET("/", func(r *core.RequestEvent) error { return views.HomePage().Render(r.Response) })
 		se.Router.GET("/login", gLogin)
 		se.Router.POST("/login", pLogin)
 		se.Router.GET("/dash/jobs", gJobs)
-		//se.Router.POST("/dash/jobs", pJobs)
+		se.Router.POST("/dash/jobs", pJob)
 		//se.Router.GET("/dash/jobs/{id}", gJob)
 		//se.Router.DELETE("/dash/jobs/{id}", dJob)
 		
@@ -92,4 +108,22 @@ func pLogin(r *core.RequestEvent) error {
 		// Expires:  time.Now().Add(time.Hour * 10),
 	})
 	return r.Redirect(302, "/dash")
+}
+func reloadJobs(app core.App) error {
+	
+	records, err := app.FindAllRecords("jobs")
+	if err != nil {
+		return err
+	}
+	for _, record := range records {
+		job, err := jobRecordToStruct(record)
+		if err != nil {
+			return err
+		}
+		err = job.RegisterCron(app)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
