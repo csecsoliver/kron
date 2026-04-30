@@ -5,11 +5,14 @@ import (
 	//"github.com/pocketbase/pocketbase/apis"
 
 	"net/url"
+	"regexp"
 
+	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/core"
+
 	//"github.com/pocketbase/pocketbase/plugins/migratecmd"
-	//. "maragu.dev/gomponents"
-	//. "maragu.dev/gomponents/html"
+	. "maragu.dev/gomponents"
+	. "maragu.dev/gomponents/html"
 
 	_ "kron/migrations"
 	"kron/models"
@@ -32,13 +35,9 @@ func gJobs(r *core.RequestEvent) error {
 	if err != nil {
 		return err
 	}
-	var jobs []models.Job
-	for _, record := range records {
-		job, err := jobRecordToStruct(record)
-		if err != nil {
-			return err
-		}
-		jobs = append(jobs, job)
+	jobs, err := jobRecordsToStructs(records)
+	if err != nil {
+		return err
 	}
 	html := views.JobsList(jobs)
 	return html.Render(r.Response)
@@ -49,18 +48,21 @@ func pJob(r *core.RequestEvent) error {
 	}
 	e := r.Request.ParseForm()
 	if e != nil {
-		return r.Error(400, "Bad request", e)
+		r.String(400, "Bad request")
+		return e
 	}
-	requiredFields := [3]string{"name", "target", "method"}
+	requiredFields := [4]string{"name", "target", "method", "schedule"}
 	for _, field := range requiredFields {
 		println(field + ": checking")
 		if !r.Request.Form.Has(field) {
-			return r.Error(400, "missing field "+field, nil)
+			r.String(200, "missing field: "+field)
+			return nil
 		}
 	}
 
 	collection, err := r.App.FindCollectionByNameOrId("jobs")
 	if err != nil {
+		r.String(200, "Server not set up")
 		return err
 	}
 
@@ -70,6 +72,7 @@ func pJob(r *core.RequestEvent) error {
 
 	_, err = url.Parse(r.Request.Form.Get("target"))
 	if err != nil {
+		r.String(200, "Invalid url")
 		return err
 	}
 	job.Target = r.Request.Form.Get("target")
@@ -79,6 +82,16 @@ func pJob(r *core.RequestEvent) error {
 	job.Expected_response = r.Request.Form.Get("expected_response")
 	job.User_id = r.Auth.Id
 	job.Schedule = r.Request.Form.Get("schedule")
+
+	cron_regexp, err :=  regexp.Compile(`(@(annually|yearly|monthly|weekly|daily|hourly|reboot))|(@every (\d+(ns|us|µs|ms|s|m|h))+)|((((\d+,)+\d+|(\d+(\/|-)\d+)|\d+|\*) ?){5,7})`)
+	if err != nil {
+		r.String(200, "Server error")
+		return err
+	}
+	if !cron_regexp.MatchString(job.Schedule) {
+		r.String(200, "Invalid cron expression")
+		return nil
+	}
 	
 	var record = core.NewRecord(collection)
 	record.Set("user_id", job.User_id)
@@ -89,13 +102,54 @@ func pJob(r *core.RequestEvent) error {
 	record.Set("schedule", job.Schedule)
 
 	if err := r.App.Save(record); err != nil {
+		r.String(200, err.Error())
 		return err
 	}
-	
+
 	err = reloadJobs(r.App)
 
-	r.String(200, "Job added successfully")
+	records, err := r.App.FindAllRecords("jobs")
+	if err != nil {
+		r.String(200, err.Error())
+		return err
+	}
+	jobs, err := jobRecordsToStructs(records)
+	if err != nil {
+		r.String(200, err.Error())
+		return err
+	}
+	return Span(
+		Text("Job added successfully"),
+		Div(
+			Attr("hx-swap-oob", "innerHTML"),
+			ID("jobslist"),
+			views.JobsList(jobs),
+		),
+		).Render(r.Response)
 
-	return nil
+	// r.String(200, "Job added successfully")
+	// return nil
 
+}
+
+func gJob(r *core.RequestEvent) error {
+	if (r.Auth == nil) {
+		r.Redirect(302, "/login")
+	}
+	record, err := r.App.FindRecordById("jobs", r.Request.PathValue("id"))
+	if err != nil {
+		r.String(200, err.Error())
+		return err
+	}
+	job, err := jobRecordToStruct(record)
+	if err != nil {
+		r.String(200, err.Error())
+		return err
+	}
+	records, err := r.App.FindRecordsByFilter("status_logs","job_id = {:jobid}", "-created_at", 0,0, dbx.Params{"jobid": job.Id})
+	if err != nil {
+		r.String(200, err.Error())
+		return err
+	}
+	return views.JobDetails(job, records).Render(r.Response)
 }

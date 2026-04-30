@@ -24,7 +24,17 @@ func jobRecordToStruct(record *core.Record) (models.Job, error) {
 	}
 	return job, nil
 }
-
+func jobRecordsToStructs(records []*core.Record) ([]models.Job, error) {
+	var jobs []models.Job
+	for _, record := range records {
+		job, err := jobRecordToStruct(record)
+		if err != nil {
+			return jobs, err
+		}
+		jobs = append(jobs, job)
+	}
+	return jobs, nil
+}
 func validate_method(method string) error {
 	switch method {
 	case "GET", "POST", "PUT", "DELETE":

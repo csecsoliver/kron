@@ -4,15 +4,15 @@ import (
 	"log"
 	"net/http"
 	"os"
-	
+
 	//"time"
 
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/apis"
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/plugins/migratecmd"
-	. "maragu.dev/gomponents"
-	. "maragu.dev/gomponents/html"
+	// . "maragu.dev/gomponents"
+	// . "maragu.dev/gomponents/html"
 
 	_ "kron/migrations"
 	"kron/views"
@@ -39,19 +39,21 @@ func main() {
 			}
 			return e.Next()
 		})
-		
-		
+
 		se.Router.GET("/static/{path...}", apis.Static(os.DirFS("./pb_public"), false))
 		se.Router.GET("/", func(r *core.RequestEvent) error { return views.HomePage().Render(r.Response) })
 		se.Router.GET("/login", gLogin)
 		se.Router.POST("/login", pLogin)
 		se.Router.GET("/dash/jobs", gJobs)
 		se.Router.POST("/dash/jobs", pJob)
-		//se.Router.GET("/dash/jobs/{id}", gJob)
+		se.Router.GET("/dash/jobs/{id}", gJob)
 		//se.Router.DELETE("/dash/jobs/{id}", dJob)
-		
-		
+
 		se.Router.GET("/dash", gDashboard)
+		
+		se.Router.POST("/test", func(r *core.RequestEvent) error {
+			return r.String(200, "test")
+		})
 		return se.Next()
 	})
 
@@ -60,14 +62,14 @@ func main() {
 	}
 }
 
-func hello(r *core.RequestEvent) error {
-	name := r.Request.PathValue("name")
-	return views.BaseLayout("Hello world",
-		Div(
-			Text("hello "+name),
-		),
-	).Render(r.Response)
-}
+//	func hello(r *core.RequestEvent) error {
+//		name := r.Request.PathValue("name")
+//		return views.BaseLayout("Hello world",
+//			Div(
+//				Text("hello "+name),
+//			),
+//		).Render(r.Response)
+//	}
 func gLogin(r *core.RequestEvent) error {
 
 	return views.LoginPage("").Render(r.Response)
@@ -110,7 +112,7 @@ func pLogin(r *core.RequestEvent) error {
 	return r.Redirect(302, "/dash")
 }
 func reloadJobs(app core.App) error {
-	
+
 	records, err := app.FindAllRecords("jobs")
 	if err != nil {
 		return err
