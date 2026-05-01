@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
 
 	//"time"
 
@@ -16,8 +15,10 @@ import (
 
 	_ "kron/migrations"
 	"kron/views"
+	"embed"
 )
-
+//go:embed pb_public/*
+var pb_public embed.FS
 func main() {
 	app := pocketbase.New()
 
@@ -40,7 +41,7 @@ func main() {
 			return e.Next()
 		})
 
-		se.Router.GET("/static/{path...}", apis.Static(os.DirFS("./pb_public"), false))
+		se.Router.GET("/static/{path...}", apis.Static(pb_public, false))
 		se.Router.GET("/", func(r *core.RequestEvent) error { return views.HomePage().Render(r.Response) })
 		se.Router.GET("/login", gLogin)
 		se.Router.POST("/login", pLogin)

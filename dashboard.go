@@ -31,7 +31,7 @@ func gJobs(r *core.RequestEvent) error {
 	if (r.Auth == nil) {
 		r.Redirect(302, "/login")
 	}
-	records, err := r.App.FindAllRecords("jobs")
+	records, err := r.App.FindRecordsByFilter("jobs","user_id = {:userid}", "-created_at", 0,0, dbx.Params{"userid": r.Auth.Id})
 	if err != nil {
 		return err
 	}
@@ -145,6 +145,10 @@ func gJob(r *core.RequestEvent) error {
 	if err != nil {
 		r.String(200, err.Error())
 		return err
+	}
+	if job.User_id != r.Auth.Id {
+		r.String(403, "Forbidden")
+		return nil
 	}
 	records, err := r.App.FindRecordsByFilter("status_logs","job_id = {:jobid}", "-created_at", 0,0, dbx.Params{"jobid": job.Id})
 	if err != nil {

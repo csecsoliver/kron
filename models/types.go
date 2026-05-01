@@ -5,8 +5,8 @@ import (
 	"io"
 	"net/http"
 	"strings"
-
 	"github.com/pocketbase/pocketbase/core"
+	"github.com/agnivade/levenshtein"
 )
 
 
@@ -86,7 +86,7 @@ func (j Job) RegisterCron(app core.App) error {
 		}
 		
 		record.Set("body", buf.String())
-		if (j.Expected_response == buf.String()){
+		if (strCmp(j.Expected_response, buf.String(), 0) || len(j.Expected_response) == 0){
 			record.Set("successful", true)
 		} else {
 			
@@ -104,4 +104,13 @@ func (j Job) RegisterCron(app core.App) error {
 		println("cron job found: "+job.Id())
 	}
 	return err
+}
+func strNormalize(s string) string {
+	return strings.Join(strings.Fields(s), "")
+}
+func strCmp(one, two string, fuzz int) bool {
+	if (levenshtein.ComputeDistance(strNormalize(one), strNormalize(two)) <= fuzz) {
+		return true
+	}
+	return false
 }
