@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/fs"
 	"log"
 	"net/http"
 
@@ -10,18 +11,20 @@ import (
 	"github.com/pocketbase/pocketbase/apis"
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/plugins/migratecmd"
+
 	// . "maragu.dev/gomponents"
 	// . "maragu.dev/gomponents/html"
 
+	"embed"
 	_ "kron/migrations"
 	"kron/views"
-	"embed"
 )
+
 //go:embed pb_public/*
 var pb_public embed.FS
+
 func main() {
 	app := pocketbase.New()
-
 	migratecmd.MustRegister(app, app.RootCmd, migratecmd.Config{
 		Automigrate: true,
 	})
@@ -40,8 +43,8 @@ func main() {
 			}
 			return e.Next()
 		})
-
-		se.Router.GET("/static/{path...}", apis.Static(pb_public, false))
+		var staticFS, _ = fs.Sub(pb_public, "pb_public")
+		se.Router.GET("/static/{path...}", apis.Static(staticFS, false))
 		se.Router.GET("/", func(r *core.RequestEvent) error { return views.HomePage().Render(r.Response) })
 		se.Router.GET("/login", gLogin)
 		se.Router.POST("/login", pLogin)
@@ -72,7 +75,9 @@ func main() {
 //		).Render(r.Response)
 //	}
 func gLogin(r *core.RequestEvent) error {
-
+	if (r.Auth != nil) {
+		r.Redirect(302, "/dash")
+	}
 	return views.LoginPage("").Render(r.Response)
 }
 func pLogin(r *core.RequestEvent) error {
