@@ -15,4 +15,4 @@ Ya can log in with any email and a password and it'll create a user for you, the
 You need to click details again to refresh it, I haven't yet added autorefresh.
 
 # Screenshots
-![Screenshot](https://myoctocat.com/assets/images/base-octocat.svg)
+![Screenshot](Screenshot_20260501_134518.png)
