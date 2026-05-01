@@ -86,7 +86,7 @@ func (j Job) RegisterCron(app core.App) error {
 		}
 		
 		record.Set("body", buf.String())
-		if (strCmp(j.Expected_response, buf.String(), 0) || len(j.Expected_response) == 0){
+		if (strCmp(j.Expected_response, buf.String(), 0) || j.Expected_response == ""){
 			record.Set("successful", true)
 		} else {
 			

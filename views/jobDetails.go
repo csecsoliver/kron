@@ -82,7 +82,7 @@ func JobDetails(job models.Job, runs []*core.Record) Node {
 				Text("Last Run Success"),
 			),
 			Td(
-				Text(strconv.FormatBool(lastRun.GetBool("success"))),
+				Text(strconv.FormatBool(lastRun.GetBool("successful"))),
 			),
 		))
 		rows = append(rows, Tr(
