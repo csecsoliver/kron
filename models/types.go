@@ -96,7 +96,8 @@ func (j Job) RegisterCron(app core.App) error {
 		println(record.GetBool("successful"))
 		err = app.Save(record)
 		if err != nil {
-			
+			record.Set("successful", false)
+			record.Set("error", err)
 			return 
 		}
 		
