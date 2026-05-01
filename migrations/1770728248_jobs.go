@@ -27,9 +27,11 @@ func init() {
 		})
 		collection.Fields.Add(&core.JSONField{
 			Name: "request",
+			MaxSize: 10000000,
 		})
 		collection.Fields.Add(&core.TextField{
 			Name: "expected_response",
+			Max: 10000000,
 		})
 		collection.Fields.Add(&core.TextField{
 			Name: "schedule",

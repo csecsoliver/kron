@@ -30,6 +30,7 @@ func init() {
 		})
 		collection.Fields.Add(&core.TextField{
 			Name: "body",
+			Max: 10000000,
 		})
 		collection.Fields.Add(&core.JSONField{
 			Name: "headers",
