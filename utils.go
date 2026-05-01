@@ -10,6 +10,7 @@ import (
 func jobRecordToStruct(record *core.Record) (models.Job, error) {
 	var job models.Job
 	job.Id = record.GetString("id")
+	job.User_id = record.GetString("user_id")
 	job.Name = record.GetString("name")
 	job.Target = record.GetString("target")
 	job.Expected_response = record.GetString("expected_response")
