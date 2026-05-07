@@ -14,5 +14,8 @@ It could even work without htmx, but I added it to make it at least a little mod
 Ya can log in with any email and a password and it'll create a user for you, then you can add jobs, where cron is mandatory (use `* * * * *` if you can't be bothered to think). If you don't provide an expected response, it will always succeed, if you add anything, it will remove whitespaces before comparison.
 You need to click details again to refresh it, I haven't yet added autorefresh.
 
+# What the hell is `cron`?
+https://en.wikipedia.org/wiki/Cron
+
 # Screenshots
 ![Screenshot](Screenshot_20260501_134518.png)
