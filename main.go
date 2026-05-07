@@ -33,6 +33,10 @@ func main() {
 		if err != nil {
 			println("Failed to reload jobs: " + err.Error())
 		}
+		err = register_delete_old_by_job(app)
+		if err != nil {
+			println("Failed to register delete old by job: " + err.Error())
+		}
 		se.Router.BindFunc(func(e *core.RequestEvent) error {
 			cookie, err := e.Request.Cookie("pb_auth")
 			if err == nil {
