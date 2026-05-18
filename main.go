@@ -58,7 +58,7 @@ func main() {
 		//se.Router.DELETE("/dash/jobs/{id}", dJob)
 
 		se.Router.GET("/dash", gDashboard)
-		
+
 		se.Router.POST("/test", func(r *core.RequestEvent) error {
 			return r.String(200, "test")
 		})
@@ -130,11 +130,11 @@ func reloadJobs(app core.App) error {
 	for _, record := range records {
 		job, err := jobRecordToStruct(record)
 		if err != nil {
-			return err
+			print(err.Error())
 		}
 		err = job.RegisterCron(app)
 		if err != nil {
-			return err
+			print(err.Error())
 		}
 	}
 	return nil
