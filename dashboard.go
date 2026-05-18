@@ -92,7 +92,7 @@ func pJob(r *core.RequestEvent) error {
 		r.String(200, "Invalid cron expression")
 		return nil
 	}
-	
+
 	var record = core.NewRecord(collection)
 	record.Set("user_id", job.User_id)
 	record.Set("name", job.Name)
@@ -108,7 +108,7 @@ func pJob(r *core.RequestEvent) error {
 
 	err = reloadJobs(r.App)
 
-	records, err := r.App.FindAllRecords("jobs")
+	records, err := r.App.FindRecordsByFilter("jobs","user_id = {:userid}", "", 0,0, dbx.Params{"userid": r.Auth.Id})
 	if err != nil {
 		r.String(200, err.Error())
 		return err

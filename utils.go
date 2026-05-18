@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"kron/models"
 
 	"github.com/pocketbase/pocketbase/core"
@@ -46,7 +47,14 @@ func validate_method(method string) error {
 }
 func register_delete_old_by_job(app core.App) error {
 	return app.Cron().Add("delete_old_by_job", "0 * * * *", func() {
-		q := app.DB().NewQuery("DELETE FROM status_logs WHERE id NOT IN (SELECT id FROM status_logs s2 WHERE s2.job_id = status_logs.job_id ORDER BY created_at DESC LIMIT 60)")
+		q := app.DB().NewQuery(`WITH ranked AS (
+			SELECT id,
+				ROW_NUMBER() OVER (PARTITION BY job_id ORDER BY created_at DESC) AS rn
+			FROM status_logs
+		)
+		DELETE FROM status_logs
+		WHERE id IN (SELECT id FROM ranked WHERE rn > 60)
+		`)
 		r, err := q.Execute()
 		if err != nil {
 			println("Error deleting old status logs: " + err.Error())
@@ -55,7 +63,7 @@ func register_delete_old_by_job(app core.App) error {
 			if err != nil {
 				println("Error getting rows affected: " + err.Error())
 			}
-			println("Deleted old status logs: " + string(rowsAffected))
+			println("Deleted old status logs: " + fmt.Sprintf("%d",rowsAffected))
 		}
 	})
 }

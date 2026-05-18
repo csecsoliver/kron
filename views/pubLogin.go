@@ -9,7 +9,8 @@ func LoginPage(error string) Node {
 	return PublicLayout(
 		"Home",
 		Div(
-			H2(Text("Login")),
+			H2(Text("Login/Register (if and account with the email does not exist, it will get created.")),
+
 			H3(Class("error"),Text(error)),
 			Form(
 				Method("POST"),
