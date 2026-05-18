@@ -83,7 +83,7 @@ func pJob(r *core.RequestEvent) error {
 	job.User_id = r.Auth.Id
 	job.Schedule = r.Request.Form.Get("schedule")
 
-	cron_regexp, err :=  regexp.Compile(`(@(annually|yearly|monthly|weekly|daily|hourly|reboot))|(@every (\d+(ns|us|µs|ms|s|m|h))+)|((((\d+,)+\d+|(\d+(\/|-)\d+)|\d+|\*) ?){5,7})`)
+	cron_regexp, err := regexp.Compile(`^(?:(?:\d+,)+\d+|(?:\d+[\/-]\d+)|\d+|\*)(?: +(?:(?:\d+,)+\d+|(?:\d+[\/-]\d+)|\d+|\*)){4}$`)
 	if err != nil {
 		r.String(200, "Server error")
 		return err
